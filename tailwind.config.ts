@@ -34,7 +34,8 @@ const config: Config = {
         pending: '#FFA726',
       },
       fontFamily: {
-        nunito: ['var(--font-nunito)', 'Nunito', 'sans-serif'],
+        sans: ['var(--font-nunito)', 'Nunito', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        nunito: ['var(--font-nunito)', 'Nunito', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       borderRadius: {
         'app-card': '10px',

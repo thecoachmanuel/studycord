@@ -14,6 +14,9 @@ const nunito = Nunito({
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-nunito',
   display: 'swap',
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -45,12 +48,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={nunito.variable} suppressHydrationWarning>
+    <html lang="en" className={`${nunito.variable} ${nunito.className}`} suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/assets/config/app_logo.svg" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="antialiased min-h-screen" suppressHydrationWarning>
+      <body className={`${nunito.className} font-nunito antialiased min-h-screen`} suppressHydrationWarning>
         <PwaRegister />
         <NavigationTracker />
         <ThemeProvider>
