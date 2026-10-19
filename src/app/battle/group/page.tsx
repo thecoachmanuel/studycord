@@ -27,11 +27,13 @@ export default function GroupBattlePage() {
   }, [isInitialized, user, isGuest]);
 
   const [mode, setMode] = useState<'create' | 'join'>('create');
-  const [roomCode, setRoomCode] = useState('841920');
+  const [roomCode, setRoomCode] = useState(() => String(Math.floor(100000 + Math.random() * 900000)));
   const [inputCode, setInputCode] = useState('');
   const [entryCoins, setEntryCoins] = useState(20);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [copied, setCopied] = useState(false);
+  const [joiningLoading, setJoiningLoading] = useState(false);
+  const [joinError, setJoinError] = useState('');
   const [insufficientModal, setInsufficientModal] = useState<{
     isOpen: boolean;
     requiredCoins: number;
@@ -39,7 +41,7 @@ export default function GroupBattlePage() {
   }>({ isOpen: false, requiredCoins: 20, actionTitle: '' });
 
   // 4 Player Slots in the lobby
-  const [players, setPlayers] = useState([
+  const [players, setPlayers] = useState<any[]>([
     {
       id: '1',
       name: user?.name || 'You (Host)',
@@ -47,28 +49,54 @@ export default function GroupBattlePage() {
       ready: true,
       isHost: true,
     },
-    {
-      id: '2',
-      name: 'Sarah Connor',
-      avatar: '/assets/config/profile/6.svg',
-      ready: true,
-      isHost: false,
-    },
-    {
-      id: '3',
-      name: 'Liam Chen',
-      avatar: '/assets/config/profile/2.svg',
-      ready: true,
-      isHost: false,
-    },
-    {
-      id: '4',
-      name: 'Maya Patel',
-      avatar: '/assets/config/profile/3.svg',
-      ready: true,
-      isHost: false,
-    },
   ]);
+
+  // Create room on the server and poll for players in the lobby
+  React.useEffect(() => {
+    if (!isInitialized || !user || isGuest) return;
+    let isCancelled = false;
+
+    // Create or sync room on backend
+    fetch('/api/battle/rooms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create',
+        code: roomCode,
+        entryCoins,
+        category: selectedCategory,
+        user: {
+          userId: user.userId,
+          name: user.name,
+          profileUrl: user.profileUrl,
+        },
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isCancelled && data.success && data.room?.players) {
+          setPlayers(data.room.players);
+        }
+      })
+      .catch(() => {});
+
+    // Poll room status every 3 seconds to reflect newly joined players in real-time
+    const pollInterval = setInterval(() => {
+      fetch(`/api/battle/rooms?code=${roomCode}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (!isCancelled && data.success && data.room?.players) {
+            setPlayers(data.room.players);
+          }
+        })
+        .catch(() => {});
+    }, 3000);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(pollInterval);
+    };
+  }, [roomCode, entryCoins, selectedCategory, isInitialized, user, isGuest]);
 
   const handleCreate = () => {
     soundManager.playClick();
@@ -81,15 +109,20 @@ export default function GroupBattlePage() {
       return;
     }
     soundManager.playCorrect();
-    router.push(`/quiz?quizType=groupPlay&entryCoins=${entryCoins}&title=Group%20Battle%20#${roomCode}`);
+    try {
+      sessionStorage.setItem('group_battle_players', JSON.stringify(players));
+    } catch {}
+    router.push(`/quiz?quizType=groupPlay&entryCoins=${entryCoins}&title=Group%20Battle%20#${roomCode}&roomId=${roomCode}`);
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     soundManager.playClick();
-    if (!inputCode.trim() || inputCode.length < 4) {
-      alert('Please enter a valid 6-digit room code.');
+    const cleanCode = inputCode.trim().toUpperCase();
+    if (!cleanCode || cleanCode.length < 4) {
+      setJoinError('Please enter a valid 6-digit room code.');
       return;
     }
+
     if (!deductCoins(entryCoins, 'Join Group Battle Room')) {
       setInsufficientModal({
         isOpen: true,
@@ -98,8 +131,43 @@ export default function GroupBattlePage() {
       });
       return;
     }
-    soundManager.playCorrect();
-    router.push(`/quiz?quizType=groupPlay&entryCoins=${entryCoins}&title=Group%20Battle%20#${inputCode}`);
+
+    setJoiningLoading(true);
+    setJoinError('');
+
+    try {
+      const res = await fetch('/api/battle/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'join',
+          code: cleanCode,
+          user: {
+            userId: user?.userId,
+            name: user?.name,
+            profileUrl: user?.profileUrl,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Room not found or full.');
+      }
+
+      soundManager.playCorrect();
+      if (data.room?.players) {
+        try {
+          sessionStorage.setItem('group_battle_players', JSON.stringify(data.room.players));
+        } catch {}
+      }
+
+      router.push(`/quiz?quizType=groupPlay&entryCoins=${entryCoins}&title=Group%20Battle%20#${cleanCode}&roomId=${cleanCode}`);
+    } catch (err: any) {
+      setJoinError(err?.message || 'Failed to join room. Please check the code.');
+      soundManager.playWrong();
+    } finally {
+      setJoiningLoading(false);
+    }
   };
 
   const copyCode = () => {
@@ -288,12 +356,18 @@ export default function GroupBattlePage() {
               className={`w-full h-14 text-center tracking-widest text-2xl font-black rounded-xl border border-slate-300 dark:border-slate-600 ${surfaceBg} ${textColor} outline-none focus:border-[#ef5388] shadow-inner`}
             />
 
+            {joinError && (
+              <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs rounded-xl font-bold">
+                {joinError}
+              </div>
+            )}
+
             <div className="p-3 rounded-xl bg-black/5 dark:bg-white/5 text-xs text-slate-400 flex items-center justify-center space-x-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Standard 20 coins entry wager applies</span>
             </div>
 
-            <QButton onClick={handleJoin} size="lg" className="w-full shadow-md">
+            <QButton onClick={handleJoin} loading={joiningLoading} size="lg" className="w-full shadow-md">
               Enter Room & Play
             </QButton>
           </div>

@@ -49,6 +49,30 @@ function CategoryContent() {
     };
   }, [categoryId]);
 
+  const categoryIcon = React.useMemo(() => {
+    const fromMock = MOCK_CATEGORIES.find(
+      (c) => c.id === String(categoryId) || c.categoryName.toLowerCase() === categoryName.toLowerCase()
+    );
+    if (fromMock?.image) return fromMock.image;
+
+    switch (String(categoryId)) {
+      case '1':
+        return '/assets/images/quiz_zone_icon.svg';
+      case '2':
+        return '/assets/images/science_icon.svg';
+      case '3':
+        return '/assets/images/maths_icon.svg';
+      case '4':
+        return '/assets/images/daily_quiz_icon.svg';
+      case '5':
+        return '/assets/images/group_battle_icon.svg';
+      case '6':
+        return '/assets/images/premium_icon.svg';
+      default:
+        return '/assets/images/quiz_zone_icon.svg';
+    }
+  }, [categoryId, categoryName]);
+
   const textColor = isDark ? 'text-[#fefefe]' : 'text-[#45536d]';
   const surfaceBg = isDark ? 'bg-[#294261]' : 'bg-white';
   const cardBorder = isDark ? 'border-slate-700' : 'border-slate-100';
@@ -63,23 +87,25 @@ function CategoryContent() {
       <QAppBar title={categoryName} onBack={handleBack} />
 
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 md:grid-cols-2 gap-3.5">
-        {subcategories.map((sub) => (
-          <div
-            key={sub.id}
-            onClick={() => {
-              soundManager.playClick();
-              router.push(`/levels?categoryId=${categoryId}&subId=${sub.id}&name=${encodeURIComponent(sub.subcategoryName)}&maxLevel=${sub.maxLevel}`);
-            }}
-            className={`w-full ${surfaceBg} rounded-[10px] p-4 flex items-center justify-between border ${cardBorder} shadow-sm hover:shadow-md transition-all cursor-pointer select-none active:scale-[0.99]`}
-          >
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-[10px] bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center p-2">
-                <QImage imageUrl="/assets/images/quiz_zone_icon.svg" width={24} height={24} />
-              </div>
-              <div>
-                <h3 className={`font-bold text-base leading-tight ${textColor}`}>
-                  {sub.subcategoryName}
-                </h3>
+        {subcategories.map((sub) => {
+          const subIcon = (sub as any).image || categoryIcon;
+          return (
+            <div
+              key={sub.id}
+              onClick={() => {
+                soundManager.playClick();
+                router.push(`/levels?categoryId=${categoryId}&subId=${sub.id}&name=${encodeURIComponent(sub.subcategoryName)}&maxLevel=${sub.maxLevel}`);
+              }}
+              className={`w-full ${surfaceBg} rounded-[10px] p-4 flex items-center justify-between border ${cardBorder} shadow-sm hover:shadow-md transition-all cursor-pointer select-none active:scale-[0.99]`}
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="w-10 h-10 rounded-[10px] bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center p-2">
+                  <QImage imageUrl={subIcon} width={24} height={24} className="brightness-0" />
+                </div>
+                <div>
+                  <h3 className={`font-bold text-base leading-tight ${textColor}`}>
+                    {sub.subcategoryName}
+                  </h3>
                 <span className="text-xs text-slate-400 mt-0.5 inline-block">
                   {sub.maxLevel} Levels Available
                 </span>

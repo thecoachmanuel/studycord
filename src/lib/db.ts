@@ -1,6 +1,14 @@
 import { MongoClient, Db } from 'mongodb';
+import dns from 'dns';
 import { COMPREHENSIVE_QUESTIONS } from './questionsData';
 import { TRUE_FALSE_LEVEL_QUESTIONS, DAILY_QUIZ_LEVEL_QUESTIONS, ADVANCED_CATEGORY_QUESTIONS } from './levelQuestionsPool';
+
+// Configure public DNS servers to resolve MongoDB Atlas SRV and TXT records reliably on Windows
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch {
+  // Ignored in non-node environments
+}
 
 const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/elite_quiz_db';
 let client: MongoClient | null = null;
@@ -15,7 +23,7 @@ declare global {
 }
 
 // Global memory store fallback if MongoDB server is unavailable or offline
-const initialMemoryStore: Record<string, any[]> = {
+export const initialMemoryStore: Record<string, any[]> = {
   categories: [
     { _id: 'cat-1', id: '1', category_name: 'General Knowledge', type: '1', image: '/assets/images/quiz_zone_icon.svg', status: '1', slug: 'general-knowledge', row_order: 1 },
     { _id: 'cat-2', id: '2', category_name: 'Science & Technology', type: '1', image: '/assets/images/science_icon.svg', status: '1', slug: 'science-technology', row_order: 2 },
@@ -414,20 +422,45 @@ const initialMemoryStore: Record<string, any[]> = {
 
 const memoryStore: Record<string, any[]> = globalThis._eliteMemoryStore || (globalThis._eliteMemoryStore = initialMemoryStore);
 
+let hasSyncedInitialData = false;
+async function ensureDbSynced(database: Db) {
+  if (hasSyncedInitialData) return;
+  hasSyncedInitialData = true;
+  try {
+    const questionCount = await database.collection('questions').countDocuments();
+    if (questionCount === 0) {
+      console.log('[MongoDB Atlas] Empty database detected. Seeding initial datasets into Atlas...');
+      for (const [colName, docs] of Object.entries(initialMemoryStore)) {
+        if (!Array.isArray(docs) || docs.length === 0) continue;
+        const count = await database.collection(colName).countDocuments();
+        if (count === 0) {
+          console.log(`[MongoDB Atlas] Seeding collection "${colName}" with ${docs.length} records...`);
+          await database.collection(colName).insertMany(docs);
+        }
+      }
+      console.log('[MongoDB Atlas] Initial datasets synced successfully.');
+    }
+  } catch (err) {
+    console.warn('[MongoDB Atlas] Auto-sync notice:', err);
+  }
+}
+
 async function getMongoClient(): Promise<MongoClient | null> {
   if (client) return client;
-  if (!process.env.MONGODB_URI) return null;
+  const currentUri = process.env.MONGODB_URI || uri;
+  if (!currentUri) return null;
 
   try {
     if (!globalThis._mongoClientPromise) {
-      const mc = new MongoClient(uri, { serverSelectionTimeoutMS: 3000 });
+      const mc = new MongoClient(currentUri, { serverSelectionTimeoutMS: 10000 });
       globalThis._mongoClientPromise = mc.connect();
     }
     clientPromise = globalThis._mongoClientPromise;
     client = await clientPromise;
     isConnectedToMongo = true;
     return client;
-  } catch {
+  } catch (err) {
+    console.warn('[MongoDB Atlas] Connection notice, operating safely with memory cache fallback:', err);
     isConnectedToMongo = false;
     return null;
   }
@@ -436,7 +469,9 @@ async function getMongoClient(): Promise<MongoClient | null> {
 export async function getDb(): Promise<Db | null> {
   const mc = await getMongoClient();
   if (mc) {
-    return mc.db();
+    const database = mc.db();
+    await ensureDbSynced(database);
+    return database;
   }
   return null;
 }

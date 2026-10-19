@@ -1,119 +1,146 @@
-# Elite Quiz App
+# StudyCord 🎓⚡
+> **The Premier Interactive Learning & Competitive Quiz Platform**
 
-This is very short guide and insufficient, for more detailed information,
-please be sure to check the [documentation](https://wrteamdev.github.io/Elite_Quiz_Doc) or Offline Doc provided in with the code.
+StudyCord is a modern, high-performance web and progressive web application (PWA) designed for students, learners, and trivia enthusiasts. Built with **Next.js 14**, **TypeScript**, **Tailwind CSS**, and **MongoDB Atlas**, StudyCord combines academic rigor with gamified mechanics, real-time multiplayer battles, and rich interactive quiz modes.
 
-#### IGNORE THE .githooks folder and setup-hooks.sh file, it is only for our development process.
-#### it doesn't affect the app code in any way.
+---
 
-## How to run the app in Android (real or emulator)
-### Android
-1. Get the packages
-```shell Get the packages
-flutter pub get
-```
-2. Run the app
-```shell
-flutter run
-```
-### IOS (Simulator)
-1. Get the packages
-```shell Get the packages
-flutter pub get
-```
-2. Get the Pods
-```shell
-cd ios
-pod install
-cd ..
-```
-3. Run the app
-```shell
-flutter run
-```
+## 🌟 Key Features
 
-## How to get your DEBUG SHA keys
-- prerequisite: ensure that you are able to use the ``keytool`` command in your terminal.
-If not, please check your Java installation. Only continue after you are able to use the ``keytool`` command.
+### 1. 🎯 Dynamic Quiz Zone
+- **Multi-Level Progression**: 10 progressive difficulty tiers per topic, scaling questions dynamically from introductory to master level.
+- **Curated Academic & Trivia Categories**:
+  - General Knowledge (World Trivia, Inventions, Arts, Mythology)
+  - Science & Technology (Physics, Computer Science & AI, Chemistry, Biology)
+  - Mathematics & Logic (Speed Math, Algebra, Geometry, Logic Puzzles)
+  - History & Geography (Ancient Civilizations, World Capitals, Warfare)
+  - Sports & Games (Football, Olympics, Basketball, Esports)
+  - Elite Masterclasses (Astrophysics, Quantum Mechanics, Philosophy)
 
-- debug keystore is automatically created when you install the Android Studio for the first time.
-- and when you sign the app with in debug mode, it will use that debug keystore.
+### 2. ⚔️ Competitive Battle Zone
+- **1 vs 1 Head-to-Head Duels**: Real-time matchmaking with players worldwide. Live opponent scoring effects, quick-chat reaction bubbles, and wagered coin stakes.
+- **4-Player Group Battles**: Create private rooms with custom 6-digit invite codes, configure entry fees, and challenge friends in real-time lobbies with automated contestant backfilling.
 
-If you are using Mac or Linux, you can use the following command to get the SHA keys:
+### 3. 🧩 Specialized Quiz Modes
+- **Fun 'N' Learn**: In-depth reading comprehension passages paired with analytical inquiry.
+- **Guess The Word**: Word riddle gameplay with interactive letter tiles and hints.
+- **Audio Questions**: Auditory recognition testing acoustic reasoning.
+- **Maths Mania**: LaTeX equation-driven problem solving with on-screen scratchpad calculators.
+- **Multi Match**: Dual-column drag-and-connect concept pairing.
+- **Self-Challenge**: Custom study sessions where learners configure question counts and timers.
 
-```shell
-keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore -keypass android -storepass android
-```
-and if you are using Windows, you can use the following command to get the SHA keys:
+### 4. 🪙 Virtual Learning Economy
+- **Starter Coin Grant**: 250 coins on signup + 50 coins for referral invite codes.
+- **In-Quiz Lifelines**: 50/50, Audience Poll, Time Reset, and Skip Lifelines.
+- **Daily Rewards**: Interactive scratch cards yielding bonus coin boosts.
+- **Coin Store**: In-app purchase tiers for competitive tournament reserves.
 
-```shell
-keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -keypass android -storepass android
-```
+### 5. 🏆 Leaderboards & Badges
+- **Global Rankings**: All-Time, Monthly, and Daily leaderboards with tier badges (Bronze, Silver, Gold, Diamond, Grandmaster).
+- **Milestone Badges**: Dynamic unlockable accolades for quiz streaks, battle victories, and study achievements.
 
-- You can find more about this in app [documentation](https://wrteamdev.github.io/Elite_Quiz_Doc/#:~:text=SHA%20keys%20and%20Keystore%20Basics).
+### 6. 🛡️ Comprehensive Admin Portal
+- Accessible via `/admin` for administrators to manage questions, categories, contests, system settings, and user balances with JWT authentication.
 
-# Rebranding
+---
 
-## How to change the app package name
+## 🛠️ Technology Stack
 
-To change the package name of the app, you can use the change_app_package_name package:
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Framework** | [Next.js 14](https://nextjs.org/) (App Router), React 18 |
+| **Language** | [TypeScript 5](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS 3](https://tailwindcss.com/) with full Dark/Light theme switching |
+| **Icons & UI** | [Lucide React](https://lucide.dev/), Canvas Confetti |
+| **Database** | [MongoDB Atlas](https://www.mongodb.com/atlas) with seamless resilient memory-fallback |
+| **Audio & Haptics** | Web Audio API acoustic synthesis + HTML5 Audio fallback |
+| **PWA** | Service Worker caching, Web App Manifest, Installable on mobile & desktop |
 
-Run the following command, replacing `com.your.package.name` with your desired package name:
-```shell
-dart run change_app_package_name:main com.your.package.name
-```
+---
 
-## How to customize app launcher icons
-The app uses flutter_launcher_icons to generate launcher icons for both Android and iOS. Follow these steps to customize the icons:
+## 🚀 Getting Started
 
-1. **Prepare your icon images:**
-   - Create a square PNG image for your app icon (recommended size: 1024x1024px)
-   - Place your icon files in the `assets/config/launcher_icons/` directory
+### Prerequisites
+- [Node.js](https://nodejs.org/) v18.17 or later
+- npm or yarn
 
-2. **Configure the `flutter_launcher_icons.yaml` file:**
-   - The configuration file is already set up in the project root
-   - Update the image paths to point to your new icon files:
-   ```yaml
-    # Example configuration
-    flutter_icons:
-      android: true
-      ios: true
-      image_path: "assets/config/launcher_icons/your_icon.png"
-   ```
-
-3. **Generate the icons:**
-   - Run the following command to generate all the required icon sizes:
-
-   ```shell
-   dart run flutter_launcher_icons
-   ```
-
-4. **Verify the icons:**
-   - Android icons will be generated in `android/app/src/main/res/`
-   - iOS icons will be generated in `ios/Runner/Assets.xcassets/AppIcon.appiconset/`
-
-5. **Additional options:**
-- For platform-specific icons, you can use `image_path_android` and `image_path_ios`
-- To remove alpha channel from iOS icons, add `remove_alpha_ios: true`
-
-After generating the icons, rebuild your app to see the changes:
-
-```shell
-flutter clean
-flutter pub get
-flutter run
+### 1. Clone the Repository
+```bash
+git clone https://github.com/thecoachmanuel/studycord.git
+cd studycord
 ```
 
-## How to build the release version of the app (for Play Store)
-prerequisite:
-- make sure you are using correct app version (you can change it from pubspec.yaml then run `flutter pub get`)
-- you will need to first create a new release keystore for the app.
-- And sign the app with it, also add the SHA keys (of keystore) in firebase, re-download the google-services.json file.
-- Run the app with release keystore make sure to check if login works fine.
-
-```shell Build App Bundle
-flutter build appbundle --release
-open build/app/outputs/bundle/release/
+### 2. Install Dependencies
+```bash
+npm install
 ```
 
-firebase deploy --only firestore
+### 3. Environment Configuration
+Copy `.env.example` to `.env.local` and set your credentials:
+```bash
+cp .env.example .env.local
+```
+
+Example configuration in `.env.local`:
+```env
+# Database Configuration (MongoDB Atlas or Local MongoDB)
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.0dnl6.mongodb.net/studycord_db?retryWrites=true&w=majority
+
+# Admin Credentials
+ADMIN_EMAIL=admin@studycord.com
+ADMIN_PASSWORD=your_secure_password
+ADMIN_JWT_SECRET=your_jwt_secret_key
+
+# Public App Configurations
+NEXT_PUBLIC_APP_NAME="StudyCord"
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_VERSION="2.3.7"
+```
+
+### 4. Run the Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 5. Build for Production
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## 📁 Project Architecture
+
+```
+studycord/
+├── public/                 # Static assets, SVG icons, audio sound effects, PWA manifest
+├── scripts/                # Database seeding, questions generators, verification tools
+├── src/
+│   ├── app/                # Next.js App Router (pages & API endpoints)
+│   │   ├── api/            # Backend REST API endpoints (battle, users, questions, etc.)
+│   │   ├── battle/         # 1v1 and Group Battle rooms & matchmaking
+│   │   ├── category/       # Category and subcategory exploration
+│   │   ├── levels/         # Level selector grid
+│   │   ├── quiz/           # Real-time quiz gameplay engine
+│   │   ├── admin/          # Management portal
+│   │   └── ...
+│   ├── components/         # Modular UI components (Tabs, Common, Layout)
+│   ├── context/            # Global React contexts (Auth, Theme, UserDetails, Settings)
+│   ├── lib/                # Database layer, quiz engine rules, translations, sound manager
+│   └── types/              # TypeScript interface definitions
+└── tailwind.config.ts      # Tailwind design system configuration
+```
+
+---
+
+## 🔒 Security Best Practices
+- Secret environment credentials (`.env`, `.env.local`) are strictly excluded via `.gitignore`.
+- Database connections use connection pooling and SRV resolution failover.
+- Admin portal access is guarded by JWT authentication.
+
+---
+
+## 📄 License
+This project is proprietary and maintained by the StudyCord team.

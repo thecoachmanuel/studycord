@@ -27,11 +27,11 @@ export default function FindOpponentPage() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [insufficientCoins, setInsufficientCoins] = useState(false);
 
-  const opponent = {
+  const [opponent, setOpponent] = useState({
     name: 'Sarah Connor',
     profile: '/assets/config/profile/6.svg',
     score: '3,120',
-  };
+  });
 
   useEffect(() => {
     if (!isInitialized || !user || isGuest) return;
@@ -41,13 +41,37 @@ export default function FindOpponentPage() {
       return;
     }
 
+    let isCancelled = false;
+
+    // Fetch real opponent from backend
+    fetch('/api/battle/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user: {
+          email: user.email,
+          name: user.name,
+        },
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isCancelled && data.success && data.opponent) {
+          setOpponent(data.opponent);
+        }
+      })
+      .catch(() => {});
+
     const t = setTimeout(() => {
       setFinding(false);
       setCountdown(3);
       soundManager.playCorrect();
     }, 2500);
 
-    return () => clearTimeout(t);
+    return () => {
+      isCancelled = true;
+      clearTimeout(t);
+    };
   }, [isInitialized, user, isGuest, coins]);
 
   useEffect(() => {
@@ -56,9 +80,13 @@ export default function FindOpponentPage() {
       const c = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(c);
     } else {
-      router.replace('/quiz?quizType=oneVsOneBattle&title=1%20vs%201%20Battle');
+      router.replace(
+        `/quiz?quizType=oneVsOneBattle&title=1%20vs%201%20Battle&oppName=${encodeURIComponent(
+          opponent.name
+        )}&oppAvatar=${encodeURIComponent(opponent.profile)}`
+      );
     }
-  }, [countdown, router]);
+  }, [countdown, opponent, router]);
 
   const textColor = isDark ? 'text-[#fefefe]' : 'text-[#45536d]';
   const surfaceBg = isDark ? 'bg-[#294261]' : 'bg-white';

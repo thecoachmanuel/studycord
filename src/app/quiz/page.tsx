@@ -86,11 +86,11 @@ function QuizContent() {
     }
   }, [is1v1Battle, deductCoins]);
 
-  // Battle State
+  // Dynamic Battle State
   const opponent = useMemo(() => ({
-    name: 'Sarah Connor',
-    profile: '/assets/config/profile/6.svg',
-  }), []);
+    name: searchParams.get('oppName') || 'Sarah Connor',
+    profile: searchParams.get('oppAvatar') || '/assets/config/profile/6.svg',
+  }), [searchParams]);
 
   const [opponentScore, setOpponentScore] = useState(0);
   const [opponentAnswerEffect, setOpponentAnswerEffect] = useState<'+20' | '+0' | null>(null);
@@ -99,12 +99,24 @@ function QuizContent() {
   const [showChatDrawer, setShowChatDrawer] = useState(false);
   const [battleResult, setBattleResult] = useState<'win' | 'lose' | 'draw' | null>(null);
 
-  // Group Battle Players
-  const [groupOpponents, setGroupOpponents] = useState([
-    { id: '2', name: 'Sarah', score: 0, avatar: '/assets/config/profile/6.svg' },
-    { id: '3', name: 'Liam', score: 0, avatar: '/assets/config/profile/2.svg' },
-    { id: '4', name: 'Maya', score: 0, avatar: '/assets/config/profile/3.svg' },
-  ]);
+  // Group Battle Players (loaded from room lobby or fallback)
+  const [groupOpponents, setGroupOpponents] = useState(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? sessionStorage.getItem('group_battle_players') : null;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const others = parsed.filter((p: any) => !p.isHost && p.name !== 'You (Host)');
+          if (others.length > 0) return others;
+        }
+      }
+    } catch {}
+    return [
+      { id: '2', name: 'Sarah Connor', score: 0, avatar: '/assets/config/profile/6.svg' },
+      { id: '3', name: 'Liam Chen', score: 0, avatar: '/assets/config/profile/2.svg' },
+      { id: '4', name: 'Maya Patel', score: 0, avatar: '/assets/config/profile/3.svg' },
+    ];
+  });
 
   // Load question dataset: Always fetch live from backend API with local cache recovery for retakes
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -285,23 +297,34 @@ function QuizContent() {
     }, 2000);
   };
 
-  // Reset audio & timer on question change
+  const hasAnsweredRef = useRef(false);
+  const isAdvancingRef = useRef(false);
+
+  // Reset audio & start countdown timer once questions are loaded and for each question change
   useEffect(() => {
+    if (loadingQuestions || questions.length === 0 || !currentQ) return;
+
     setTimeLeft(DURATION);
     setSelectedOptionId(null);
     setHasAnswered(false);
+    hasAnsweredRef.current = false;
+    isAdvancingRef.current = false;
     setHiddenOptions([]);
     setPollPercentages({});
     setShowAudienceModal(false);
     setIsPlayingAudio(false);
     setAudioProgress(0);
-    if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
 
+    if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timerRef.current!);
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
           handleTimeOut();
           return 0;
         }
@@ -310,10 +333,13 @@ function QuizContent() {
     }, 1000);
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
       if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
     };
-  }, [currentIndex]);
+  }, [currentIndex, loadingQuestions, DURATION]);
 
   const toggleAudio = () => {
     soundManager.playClick();
@@ -353,25 +379,44 @@ function QuizContent() {
   };
 
   const handleTimeOut = () => {
-    if (hasAnswered) return;
-    setHasAnswered(true);
-    setWrongCount((w) => w + 1);
-    soundManager.playWrong();
-    soundManager.vibrate(80);
+    if (isAdvancingRef.current) return;
 
-    setTimeout(() => {
-      goToNext();
-    }, 1500);
+    if (!hasAnsweredRef.current) {
+      // User did not select any option before time elapsed: mark timed out
+      setHasAnswered(true);
+      hasAnsweredRef.current = true;
+      setWrongCount((w) => w + 1);
+      soundManager.playWrong();
+      soundManager.vibrate(80);
+
+      // Highlight the correct answer briefly (1000ms) then automatically take to next question
+      setTimeout(() => {
+        if (!isAdvancingRef.current) {
+          goToNext(false);
+        }
+      }, 1000);
+    } else {
+      // User already clicked an option, ensure auto-advance proceeds
+      setTimeout(() => {
+        if (!isAdvancingRef.current) {
+          goToNext();
+        }
+      }, 300);
+    }
   };
 
   const handleSelectOption = (optionId: string) => {
-    if (hasAnswered || !currentQ) return;
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (hasAnsweredRef.current || isAdvancingRef.current || !currentQ) return;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
     setIsPlayingAudio(false);
 
     setSelectedOptionId(optionId);
     setHasAnswered(true);
+    hasAnsweredRef.current = true;
     setUserAnswers((prev) => ({ ...prev, [currentQ.id]: optionId }));
 
     const isCorrect = optionId === currentQ.correctAnswerOptionId;
@@ -381,19 +426,29 @@ function QuizContent() {
       setScoreCount((s) => s + pointsPerCorrect);
       setCorrectCount((c) => c + 1);
       addScore(pointsPerCorrect);
-      // NOTE: Coins are single-source credited at quiz completion in recordQuizCompletion to prevent duplication and protect admin purse
     } else {
       soundManager.playWrong();
       soundManager.vibrate(80);
       setWrongCount((w) => w + 1);
     }
 
+    // Automatically advance to next question after feedback
     setTimeout(() => {
-      goToNext(isCorrect);
+      if (!isAdvancingRef.current) {
+        goToNext(isCorrect);
+      }
     }, 1200);
   };
 
   const goToNext = (wasCorrect?: boolean) => {
+    if (isAdvancingRef.current) return;
+    isAdvancingRef.current = true;
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     if (isLastQuestion) {
       const finalCorrect = wasCorrect ? correctCount + 1 : correctCount;
       const finalScore = wasCorrect ? scoreCount + pointsPerCorrect : scoreCount;
