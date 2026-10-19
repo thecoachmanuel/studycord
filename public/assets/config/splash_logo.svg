@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 80" fill="none">
+  <!-- StudyGuru Splash Emblem -->
+  <g transform="translate(6, 10)">
+    <!-- Hexagonal Glow Crest -->
+    <rect x="0" y="0" width="60" height="60" rx="16" fill="#ffffff" fill-opacity="0.2"/>
+    <rect x="2" y="2" width="56" height="56" rx="14" fill="#ffffff"/>
+    
+    <!-- Stylized Academic Graduation Cap -->
+    <path d="M30 16L48 25L30 34L12 25L30 16Z" fill="#ef5388"/>
+    <path d="M19 28.5V39C19 39 23.5 43 30 43C36.5 43 41 39 41 39V28.5" stroke="#ef5388" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Gold Tassel -->
+    <path d="M44 26.5V37" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="44" cy="38" r="2.5" fill="#FFD700"/>
+    
+    <!-- Open Book Line -->
+    <path d="M16 48C22 45.5 26.5 47.5 30 49C33.5 47.5 38 45.5 44 48" stroke="#ef5388" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Typography: StudyGuru (White for dark/splash backgrounds) -->
+  <g transform="translate(78, 48)">
+    <text font-family="'Nunito', 'Inter', system-ui, sans-serif" font-size="32" font-weight="900" fill="#ffffff" letter-spacing="-0.5">Study</text>
+    <text x="86" y="0" font-family="'Nunito', 'Inter', system-ui, sans-serif" font-size="32" font-weight="900" fill="#FFD700" letter-spacing="-0.5">Guru</text>
+  </g>
+  <!-- Subtitle Tag -->
+  <text x="80" y="66" font-family="'Nunito', 'Inter', system-ui, sans-serif" font-size="10" font-weight="800" fill="#ffffff" fill-opacity="0.85" letter-spacing="2.5">QUIZ &amp; LEARNING PLATFORM</text>
+</svg>

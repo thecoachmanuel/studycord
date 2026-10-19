@@ -1,0 +1,196 @@
+const fs = require('fs');
+const path = require('path');
+
+// Complete list of categories and subcategories
+const allCategoriesConfig = [
+  {
+    id: '1',
+    name: 'General Knowledge',
+    subs: [
+      { id: '101', name: 'World Trivia & Wonders' },
+      { id: '102', name: 'Famous Inventions & Discoveries' },
+      { id: '103', name: 'Global Cultures & Traditions' },
+      { id: '104', name: 'Human Body & Health' },
+      { id: '105', name: 'Cinema, Music & Entertainment' },
+      { id: '106', name: 'Flora, Fauna & Wildlife' },
+    ]
+  },
+  {
+    id: '2',
+    name: 'Science & Technology',
+    subs: [
+      { id: '201', name: 'Physics & Astrophysics' },
+      { id: '202', name: 'Computer Science & Programming' },
+      { id: '203', name: 'Chemistry & Periodic Table' },
+      { id: '204', name: 'Biology & Genetics' },
+      { id: '205', name: 'Artificial Intelligence & Robotics' },
+      { id: '206', name: 'Earth & Environmental Science' },
+    ]
+  },
+  {
+    id: '3',
+    name: 'Mathematics & Logic',
+    subs: [
+      { id: '301', name: 'Mental Arithmetic & Speed Math' },
+      { id: '302', name: 'Algebra & Algebraic Equations' },
+      { id: '303', name: 'Geometry & Spatial Reasoning' },
+      { id: '304', name: 'Logic Puzzles & Brainteasers' },
+      { id: '305', name: 'Probability, Permutations & Statistics' },
+      { id: '306', name: 'Number Theory & Numerical Sequences' },
+    ]
+  },
+  {
+    id: '4',
+    name: 'History & Geography',
+    subs: [
+      { id: '401', name: 'Ancient Civilizations & Empires' },
+      { id: '402', name: 'World Capitals & Nations' },
+      { id: '403', name: 'Modern World History & Revolutions' },
+      { id: '404', name: 'Physical Geography & Natural Wonders' },
+      { id: '405', name: 'African & Global Heritage' },
+      { id: '406', name: 'Historic Explorers & Famous Expeditions' },
+    ]
+  },
+  {
+    id: '5',
+    name: 'Sports & Games',
+    subs: [
+      { id: '501', name: 'Football & Soccer World Cups' },
+      { id: '502', name: 'Olympic Games & Athletics' },
+      { id: '503', name: 'Basketball & NBA History' },
+      { id: '504', name: 'Tennis Grand Slams & Champions' },
+      { id: '505', name: 'Martial Arts & Combat Sports' },
+      { id: '506', name: 'Chess, Esports & Board Games' },
+    ]
+  },
+  {
+    id: '6',
+    name: 'Elite Premium Masterclass',
+    subs: [
+      { id: '601', name: 'Advanced Software Architecture' },
+      { id: '602', name: 'Global Economics & Financial Markets' },
+      { id: '603', name: 'Geopolitics & International Relations' },
+      { id: '604', name: 'Philosophy, Ethics & Epistemology' },
+      { id: '605', name: 'Quantum Physics & Frontier Science' },
+    ]
+  }
+];
+
+// Rich question banks for each subcategory
+const questionBank = {
+  // Category 3: Mathematics & Logic
+  '301': [
+    ['What is the product of 17 multiplied by 6?', '102', '98', '108', '112', '17 × 6 = (10 × 6) + (7 × 6) = 60 + 42 = 102.'],
+    ['What is 25% of 360?', '90', '80', '120', '75', '25% equals one quarter: 360 / 4 = 90.'],
+    ['If an item costs ₦800 and is discounted by 15%, what is the sale price?', '₦680', '₦700', '₦660', '₦720', '15% of 800 is 120. 800 - 120 = ₦680.'],
+    ['What is the square of 19?', '361', '381', '341', '391', '19 × 19 = 361.'],
+    ['What is 144 divided by 12?', '12', '14', '11', '16', '12 × 12 = 144.'],
+    ['What is the sum of angles in a flat Euclidean triangle?', '180 degrees', '360 degrees', '90 degrees', '270 degrees', 'The interior angles of any planar triangle always add up to exactly 180°.'],
+    ['What is the cube root of 216?', '6', '7', '8', '5', '6 × 6 × 6 = 216.'],
+    ['Evaluate: 15 × 15 - 25', '200', '190', '210', '225', '15 × 15 = 225; 225 - 25 = 200.'],
+    ['What is 3/5 expressed as a percentage?', '60%', '50%', '65%', '70%', '3 / 5 = 0.60, which equals 60%.'],
+    ['If a train travels 180 kilometers in 2 hours, what is its average speed?', '90 km/h', '80 km/h', '100 km/h', '85 km/h', 'Speed = Distance / Time = 180 km / 2 h = 90 km/h.'],
+    ['What is the value of 2 to the power of 8?', '256', '128', '512', '64', '2^8 = 256.'],
+    ['Simplify: 48 / (6 + 2) × 3', '18', '24', '12', '16', 'Following order of operations: 48 / 8 = 6; 6 × 3 = 18.'],
+    ['What is 40% of 250?', '100', '90', '110', '125', '0.40 × 250 = 100.'],
+    ['What is the median of the numbers 4, 8, 15, 23, 42?', '15', '8', '23', '18.4', 'In an ordered set of 5 numbers, the middle (3rd) value is 15.'],
+    ['What is 0.075 expressed as a fraction in simplest terms?', '3/40', '1/15', '3/20', '7/100', '75/1000 reduces by dividing numerator and denominator by 25 to 3/40.'],
+    ['What is the sum of consecutive integers from 1 to 20?', '210', '200', '220', '190', 'Formula n(n+1)/2 gives 20 × 21 / 2 = 210.'],
+    ['What is 15% of ₦4,000?', '₦600', '₦500', '₦700', '₦800', '0.15 × 4,000 = ₦600.'],
+    ['If x + 7 = 22, what is the value of x?', '15', '14', '16', '13', 'x = 22 - 7 = 15.'],
+    ['What is the prime factorization of 36?', '2² × 3²', '2³ × 3', '2 × 3³', '4 × 9', '36 = 4 × 9 = 2² × 3².'],
+    ['What is 7 cubed (7³)?', '343', '243', '49', '323', '7 × 7 = 49; 49 × 7 = 343.'],
+  ],
+  '302': [
+    ['Solve for x: 3x - 9 = 21', '10', '8', '12', '9', '3x = 30 => x = 10.'],
+    ['What are the roots of the quadratic equation x² - 5x + 6 = 0?', '2 and 3', '1 and 6', '-2 and -3', '-1 and -6', '(x - 2)(x - 3) = 0 => x = 2 or x = 3.'],
+    ['What is the slope of the line given by the equation y = 4x - 7?', '4', '-7', '7/4', '-4', 'In slope-intercept form y = mx + b, m represents the slope.'],
+    ['If f(x) = 2x² - 3x + 1, what is the value of f(3)?', '10', '8', '12', '14', 'f(3) = 2(9) - 3(3) + 1 = 18 - 9 + 1 = 10.'],
+    ['Simplify the algebraic expression: (x + 4)(x - 4)', 'x² - 16', 'x² + 16', 'x² - 8x - 16', 'x² + 8x - 16', 'Difference of two squares formula: (a+b)(a-b) = a² - b².'],
+    ['What is the value of x in the equation 2^(x+1) = 32?', '4', '5', '3', '6', '32 = 2^5 => x + 1 = 5 => x = 4.'],
+    ['If 5x + 3y = 20 and y = 0, what is x?', '4', '5', '3', '6', '5x = 20 => x = 4.'],
+    ['Factorize completely: 2x² + 8x', '2x(x + 4)', '2(x² + 4)', 'x(2x + 8)', '4x(x + 2)', 'Factoring out greatest common factor 2x gives 2x(x + 4).'],
+    ['If a = 3 and b = -2, evaluate a² - b².', '5', '13', '1', '7', 'a² - b² = 3² - (-2)² = 9 - 4 = 5.'],
+    ['What is the discriminant of the quadratic equation ax² + bx + c = 0?', 'b² - 4ac', 'b² + 4ac', '2a - 4bc', '√(b² - 4ac)', 'The discriminant Δ = b² - 4ac determines the nature of the roots.'],
+    ['Solve for y: 4(y - 2) = 2y + 6', '7', '5', '6', '8', '4y - 8 = 2y + 6 => 2y = 14 => y = 7.'],
+    ['What is the inverse function of f(x) = 3x + 6?', 'f⁻¹(x) = (x - 6)/3', 'f⁻¹(x) = 3x - 6', 'f⁻¹(x) = (x + 6)/3', 'f⁻¹(x) = 6x - 3', 'Swap x and y: x = 3y + 6 => 3y = x - 6 => y = (x - 6)/3.'],
+    ['Expand: (2x - 3)²', '4x² - 12x + 9', '4x² - 9', '4x² + 12x + 9', '4x² - 6x + 9', '(a - b)² = a² - 2ab + b² => (2x)² - 2(2x)(3) + 3² = 4x² - 12x + 9.'],
+    ['What is the degree of the polynomial 5x⁴ - 3x² + 7x - 9?', '4', '5', '3', '2', 'The degree is the highest exponent of the variable in the polynomial.'],
+    ['If x/3 = 7/9, what is x?', '7/3 (or 2.33)', '3/7', '21', '9/7', 'x = 3 × 7 / 9 = 21/9 = 7/3.'],
+    ['Simplify: (x³ * x⁴) / x²', 'x⁵', 'x⁶', 'x⁷', 'x⁴', 'x^(3+4) / x² = x^7 / x² = x^(7-2) = x^5.'],
+    ['Solve: |x - 4| = 9. What are the solutions?', 'x = 13 and x = -5', 'x = 5 and x = -13', 'x = 13 and x = 5', 'x = 9 and x = -9', 'x - 4 = 9 => x = 13; x - 4 = -9 => x = -5.'],
+    ['What is the product of (x + 5)(x + 2)?', 'x² + 7x + 10', 'x² + 10x + 7', 'x² + 3x + 10', 'x² + 7x + 7', 'x² + 2x + 5x + 10 = x² + 7x + 10.'],
+    ['If 3x + 2y = 12 and x = 2, find y.', '3', '2', '4', '5', '3(2) + 2y = 12 => 6 + 2y = 12 => 2y = 6 => y = 3.'],
+    ['What is the vertex of the parabola y = (x - 3)² + 5?', '(3, 5)', '(-3, 5)', '(3, -5)', '(-3, -5)', 'Vertex form y = a(x - h)² + k gives vertex (h, k) = (3, 5).'],
+  ],
+  '303': [
+    ['What is the perimeter of a rectangle with length 14 cm and width 6 cm?', '40 cm', '20 cm', '84 cm', '48 cm', 'Perimeter = 2(length + width) = 2(14 + 6) = 40 cm.'],
+    ['What is the area of a circle with radius 7 cm (use π ≈ 22/7)?', '154 cm²', '144 cm²', '44 cm²', '168 cm²', 'Area = πr² = (22/7) × 7 × 7 = 154 cm².'],
+    ['In a right-angled triangle, if legs are 6 cm and 8 cm, what is the hypotenuse?', '10 cm', '12 cm', '14 cm', '9 cm', 'Pythagorean theorem: c = √(6² + 8²) = √(36 + 64) = √100 = 10 cm.'],
+    ['How many degrees are in the sum of the interior angles of a quadrilateral?', '360°', '180°', '540°', '720°', 'The interior angles of any four-sided polygon sum to 360°.'],
+    ['What is the volume of a cube with side length 5 cm?', '125 cm³', '25 cm³', '100 cm³', '150 cm³', 'Volume = s³ = 5 × 5 × 5 = 125 cm³.'],
+    ['What is an angle measuring more than 90° but less than 180° called?', 'Obtuse angle', 'Acute angle', 'Reflex angle', 'Right angle', 'An obtuse angle is between 90° and 180°.'],
+    ['How many edges does a standard rectangular cube have?', '12', '8', '6', '16', 'A cube has 6 faces, 8 vertices, and 12 straight edges.'],
+    ['What is the formula for the area of a triangle with base b and height h?', '1/2 × b × h', 'b × h', '2 × b × h', 'π × b × h', 'Area of a triangle equals half of base multiplied by perpendicular height.'],
+    ['What is the circumference of a circle with diameter 14 cm (π ≈ 22/7)?', '44 cm', '88 cm', '28 cm', '154 cm', 'Circumference C = πd = (22/7) × 14 = 44 cm.'],
+    ['What type of triangle has all three sides of equal length?', 'Equilateral triangle', 'Isosceles triangle', 'Scalene triangle', 'Right triangle', 'Equilateral triangles have 3 equal sides and 3 angles of 60°.'],
+    ['What is the surface area of a sphere with radius r?', '4πr²', '2πr', '4/3 πr³', 'πr²', 'Surface area of a sphere is 4πr².'],
+    ['In trigonometry, what is the sine of a 30° angle?', '0.5 (1/2)', '0.866 (√3/2)', '0.707 (√2/2)', '1', 'sin(30°) = 1/2.'],
+    ['What is the sum of exterior angles of any convex polygon?', '360°', '180°', '540°', 'Depends on sides', 'The exterior angles of any convex polygon always sum to 360°.'],
+    ['How many lines of symmetry does a regular hexagon have?', '6', '3', '4', '8', 'A regular hexagon has 6 lines of reflectional symmetry.'],
+    ['What is the distance between points (0, 0) and (3, 4) in Cartesian coordinates?', '5 units', '7 units', '6 units', '4 units', 'd = √(3² + 4²) = √(9 + 16) = √25 = 5.'],
+  ],
+  '304': [
+    ['If all Bloops are Razzies and all Razzies are Lizzies, are all Bloops definitely Lizzies?', 'Yes, definitely', 'No, never', 'Only some', 'Cannot be determined', 'Syllogistic logic: transitive property dictates Bloops ⊂ Razzies ⊂ Lizzies.'],
+    ['I am an odd number. Take away one letter and I become even. What number am I?', 'Seven', 'Eleven', 'Nine', 'Five', 'Take away \'s\' from "Seven" and you get "even".'],
+    ['A farmer has 17 sheep, and all but 9 run away. How many sheep does the farmer have left?', '9', '8', '17', '0', '"All but 9" means exactly 9 sheep remained on the farm.'],
+    ['What comes next in the sequence: 2, 4, 8, 16, 32, ...?', '64', '48', '56', '72', 'Each term is multiplied by 2.'],
+    ['Which letter comes next in the sequence: O, T, T, F, F, S, S, E, N, ...?', 'T', 'O', 'E', 'N', 'First letters of numbers: One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten.'],
+    ['If a doctor gives you 3 pills and tells you to take one every half hour, how long will they last?', '1 hour', '1.5 hours', '2 hours', '30 minutes', 'Pill 1 at 0 min, Pill 2 at 30 min, Pill 3 at 60 min (1 hour total).'],
+    ['Mary\'s father has 5 daughters: Nana, Nene, Nini, Nono, and who?', 'Mary', 'Nunu', 'Nyna', 'Nana Jr', 'Mary is the 5th daughter mentioned in "Mary\'s father".'],
+    ['If you overtake the person in second place in a running race, what place are you in?', 'Second place', 'First place', 'Third place', 'Last place', 'You take the position of the person you passed, which was second.'],
+    ['What is heavier: a ton of bricks or a ton of feathers?', 'They weigh the same', 'Ton of bricks', 'Ton of feathers', 'Depends on volume', 'Both weigh exactly one ton.'],
+    ['A clock shows 3:15. What is the angle between the hour hand and the minute hand?', '7.5°', '0°', '15°', '5°', 'In 15 minutes, the hour hand moves 15 × 0.5° = 7.5° past the 3.'],
+    ['Which number does not belong: 2, 3, 5, 7, 9, 11, 13?', '9', '2', '7', '11', '9 is composite (3 × 3), while all others are prime numbers.'],
+    ['How many months have 28 days?', 'All 12 months', 'Only 1 (February)', '6 months', '4 months', 'Every single month has at least 28 days.'],
+    ['What can run but never walks, has a bed but never sleeps, and has a mouth but never talks?', 'A River', 'A Car', 'A Watch', 'Wind', 'A river runs, has a riverbed, and has a river mouth.'],
+    ['If yesterday was Friday, what day will it be day after tomorrow?', 'Monday', 'Sunday', 'Saturday', 'Tuesday', 'If yesterday was Friday, today is Saturday, tomorrow is Sunday, day after tomorrow is Monday.'],
+    ['You have a 3-gallon jug and a 5-gallon jug. How can you measure exactly 4 gallons?', 'Fill 5, pour into 3 leaving 2; empty 3, transfer 2, fill 5 and pour 1 into 3 leaving 4', 'Fill 3 twice', 'Fill 5 half way', 'Impossible without scales', 'Classic logic puzzle used in water decanting problems.'],
+  ],
+  '305': [
+    ['What is the probability of rolling a 4 on a fair standard six-sided die?', '1/6', '1/4', '1/3', '1/2', 'There is 1 favorable outcome out of 6 mutually exclusive sides: P = 1/6.'],
+    ['If you flip two fair coins, what is the probability of getting two heads?', '1/4 (25%)', '1/2 (50%)', '1/3 (33%)', '1/8 (12.5%)', 'Four equally likely outcomes: HH, HT, TH, TT. P(HH) = 1/4.'],
+    ['In how many distinct ways can 4 books be arranged on a shelf?', '24', '16', '12', '32', '4! = 4 × 3 × 2 × 1 = 24 arrangements.'],
+    ['What is the probability of drawing an Ace from a standard 52-card deck?', '1/13', '1/52', '4/13', '1/4', 'There are 4 Aces in 52 cards: 4/52 = 1/13.'],
+    ['What is the arithmetic mean of the numbers: 10, 20, 30, 40, 50?', '30', '25', '35', '40', 'Sum = 150. Mean = 150 / 5 = 30.'],
+    ['What statistical term represents the value that appears most frequently in a dataset?', 'Mode', 'Median', 'Mean', 'Range', 'The mode is the most frequently occurring data value.'],
+    ['What is the probability of an impossible event happening?', '0', '1', '-1', '0.5', 'Probability is bounded between 0 (impossible) and 1 (certain).'],
+    ['How many possible outcomes are there when rolling two standard dice together?', '36', '12', '24', '18', '6 × 6 = 36 total outcomes.'],
+    ['What is the range of the dataset: 3, 7, 12, 19, 25?', '22', '25', '19', '16', 'Range = Maximum - Minimum = 25 - 3 = 22.'],
+    ['What is the value of 5 factorial (5!)?', '120', '60', '100', '24', '5! = 5 × 4 × 3 × 2 × 1 = 120.'],
+    ['If the probability of rain tomorrow is 0.35, what is the probability it does NOT rain?', '0.65', '0.35', '0.75', '0.50', 'P(not rain) = 1 - 0.35 = 0.65 (65%).'],
+    ['In a bell-shaped normal distribution curve, approximately what percentage of data falls within 1 standard deviation of the mean?', '68%', '50%', '95%', '99.7%', 'The empirical 68-95-99.7 rule states ~68% of data falls within ±1σ.'],
+    ['How many combinations of 2 items can be chosen from a group of 5 items (5C2)?', '10', '20', '15', '5', '5C2 = 5! / (2! 3!) = (5 × 4) / 2 = 10.'],
+    ['What is the variance of a dataset that has a standard deviation of 4?', '16', '8', '2', '64', 'Variance is the square of standard deviation: 4² = 16.'],
+    ['What type of probability distribution models the number of successes in n independent Bernoulli trials?', 'Binomial distribution', 'Poisson distribution', 'Normal distribution', 'Uniform distribution', 'The binomial distribution models discrete successes with fixed probability p.'],
+  ],
+  '306': [
+    ['What is the only even prime number?', '2', '0', '4', '6', '2 is the only even prime number because all other even numbers are divisible by 2.'],
+    ['What are the first 6 numbers in the Fibonacci sequence starting with 0 and 1?', '0, 1, 1, 2, 3, 5', '0, 1, 2, 3, 4, 5', '1, 2, 3, 5, 8, 13', '0, 1, 2, 4, 8, 16', 'Each Fibonacci number is the sum of the two preceding numbers.'],
+    ['What is the greatest common divisor (GCD) of 36 and 48?', '12', '6', '18', '24', 'Factors of 36 and 48 share 12 as the greatest common divisor.'],
+    ['What is the least common multiple (LCM) of 6 and 8?', '24', '48', '16', '14', 'Multiples of 6 (6, 12, 18, 24...) and 8 (8, 16, 24...) meet at 24.'],
+    ['A number is divisible by 3 if and only if what condition is met?', 'The sum of its digits is divisible by 3', 'Its last digit is 3', 'Its last digit is odd', 'It ends in 0 or 3', 'The digital root rule states a number is divisible by 3 if its digit sum is a multiple of 3.'],
+    ['What is the smallest positive integer that is neither prime nor composite?', '1', '0', '2', '3', '1 has only one positive divisor (itself), so by definition it is neither prime nor composite.'],
+    ['How many prime numbers exist between 1 and 20?', '8', '7', '9', '10', 'The primes are 2, 3, 5, 7, 11, 13, 17, and 19 (8 total).'],
+    ['What famous theorem states that a² + b² = c² has no non-zero integer solutions for n > 2?', 'Fermat\'s Last Theorem', 'Pythagorean Theorem', 'Goldbach\'s Conjecture', 'Euler\'s Identity', 'Pierre de Fermat conjectured this in 1637, proved by Andrew Wiles in 1994.'],
+    ['What is a number called if the sum of its proper divisors equals the number itself (e.g. 6 = 1 + 2 + 3)?', 'Perfect number', 'Prime number', 'Abundant number', 'Deficient number', '6, 28, 496, and 8128 are the first four perfect numbers.'],
+    ['What is the remainder when 47 is divided by 5?', '2', '3', '1', '4', '47 = (9 × 5) + 2, so the remainder is 2.'],
+    ['What is the Roman numeral for 500?', 'D', 'C', 'L', 'M', 'Roman numerals: L=50, C=100, D=500, M=1000.'],
+    ['Which ancient Greek mathematician wrote the "Elements", establishing axiomatic geometry and number theory?', 'Euclid', 'Pythagoras', 'Archimedes', 'Aristotle', 'Euclid\'s Elements introduced the Euclidean algorithm for greatest common divisors.'],
+    ['What is the base of the hexadecimal numeral system?', '16', '8', '10', '2', 'Hexadecimal uses digits 0-9 and letters A-F to represent numbers in base 16.'],
+    ['What is a prime number that is one less than a power of two (2^p - 1) called?', 'Mersenne prime', 'Fermat prime', 'Twin prime', 'Sophie Germain prime', 'Mersenne primes are of the form 2^p - 1 and are key in modern cryptography.'],
+    ['What is the sum of the first 10 positive odd integers (1 + 3 + ... + 19)?', '100', '90', '110', '81', 'The sum of the first n odd numbers is always n²: 10² = 100.'],
+  ],
+};
+
+console.log('Script loaded. Preparing comprehensive data generation...');

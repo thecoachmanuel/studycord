@@ -1,0 +1,615 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,600,700,800");
+
+:root {
+  --theme-color: #f05387;
+  --navbar-color: #f05387;
+  --navbar-text-color: #ffffff;
+  --admin-bg: #f4f6f9;
+  --card-bg: #ffffff;
+  --card-border: #f9f9f9;
+  --text-main: #34395e;
+  --text-muted: #6c757d;
+  --sidebar-bg: #ffffff;
+  --sidebar-color: #6c757d;
+  --sidebar-active-bg: #f05387;
+  --border-color: #e4e6fc;
+  --table-border: #f9f9f9;
+}
+
+[data-admin-theme="dark"] {
+  --theme-color: #f05387;
+  --navbar-color: #1e2430;
+  --navbar-text-color: #ffffff;
+  --admin-bg: #141824;
+  --card-bg: #1e2430;
+  --card-border: #293042;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --sidebar-bg: #1a202c;
+  --sidebar-color: #94a3b8;
+  --sidebar-active-bg: #f05387;
+  --border-color: #293042;
+  --table-border: #293042;
+}
+
+/* Stisla Authentic Core */
+.stisla-admin {
+  font-family: 'Nunito', 'Segoe UI', arial, sans-serif;
+  background-color: var(--admin-bg);
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.stisla-admin a {
+  color: var(--theme-color);
+  text-decoration: none;
+}
+
+.stisla-admin .navbar-bg {
+  content: ' ';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: var(--navbar-color);
+  z-index: 870;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.stisla-admin .main-navbar {
+  height: 70px;
+  left: 250px;
+  right: 0;
+  position: fixed;
+  top: 0;
+  z-index: 880;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s;
+}
+
+@media (max-width: 1024px) {
+  .stisla-admin .main-navbar {
+    left: 0 !important;
+  }
+}
+
+.stisla-admin .main-sidebar {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  z-index: 890;
+  overflow-y: auto;
+  transition: all 0.3s;
+  border-right: 1px solid var(--border-color);
+}
+
+.stisla-admin .main-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.stisla-admin .main-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+}
+
+.stisla-admin .sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stisla-admin .sidebar-menu {
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.stisla-admin .sidebar-menu li {
+  display: block;
+}
+
+.stisla-admin .sidebar-menu li a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 20px;
+  width: 100%;
+  color: var(--sidebar-color);
+  letter-spacing: 0.3px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.stisla-admin .sidebar-menu li a:hover {
+  background-color: rgba(240, 83, 135, 0.06);
+  color: var(--theme-color);
+}
+
+.stisla-admin .sidebar-menu li.active > a {
+  color: #ffffff;
+  background-color: var(--sidebar-active-bg);
+  box-shadow: 0 2px 6px rgba(240, 83, 135, 0.4);
+}
+
+.stisla-admin .sidebar-menu li a em,
+.stisla-admin .sidebar-menu li a i {
+  width: 28px;
+  margin-right: 10px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.stisla-admin .sidebar-menu li.menu-header {
+  padding: 10px 20px 4px 20px;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.3px;
+  font-weight: 700;
+}
+
+.stisla-admin .main-content {
+  padding-left: 280px;
+  padding-right: 30px;
+  padding-top: 95px;
+  padding-bottom: 70px;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  transition: all 0.3s;
+}
+
+@media (max-width: 1024px) {
+  .stisla-admin .main-content {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* Stisla Card Statistic 1 */
+.stisla-admin .card.card-statistic-1 {
+  display: inline-block;
+  width: 100%;
+  background-color: var(--card-bg);
+  border-radius: 5px;
+  border: 1px solid var(--card-border);
+  position: relative;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.stisla-admin .card.card-statistic-1:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.stisla-admin .card.card-statistic-1 .card-icon {
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+  border-radius: 4px;
+  line-height: 80px;
+  text-align: center;
+  float: left;
+  margin-right: 15px;
+  color: #fff;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stisla-admin .card.card-statistic-1 .card-wrap {
+  padding: 18px 0;
+}
+
+.stisla-admin .card.card-statistic-1 .card-header {
+  border-bottom: none;
+  padding: 0;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.stisla-admin .card.card-statistic-1 .card-header h4 {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.stisla-admin .card.card-statistic-1 .card-body {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-main);
+  padding: 0;
+  margin-top: 3px;
+}
+
+/* Stisla General Card */
+.stisla-admin .card {
+  background-color: var(--card-bg);
+  border-radius: 5px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.stisla-admin .card .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--card-border);
+  padding: 15px 25px;
+}
+
+.stisla-admin .card .card-header h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.stisla-admin .card .card-header h4 small {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.stisla-admin .card .card-body {
+  padding: 25px;
+}
+
+/* Stisla Section Header */
+.stisla-admin .section-header {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+  background-color: var(--card-bg);
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 25px;
+  padding: 16px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stisla-admin .section-header h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--theme-color);
+}
+
+/* Colors matching Stisla CSS */
+.stisla-admin .bg-primary { background-color: #6777ef !important; }
+.stisla-admin .bg-danger { background-color: #fc544b !important; }
+.stisla-admin .bg-warning { background-color: #ffa426 !important; }
+.stisla-admin .bg-success { background-color: #47c363 !important; }
+.stisla-admin .bg-info { background-color: #3abaf4 !important; }
+
+/* Buttons */
+.stisla-admin .btn-primary {
+  background-color: var(--theme-color);
+  border-color: var(--theme-color);
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.stisla-admin .btn-primary:hover {
+  opacity: 0.92;
+  box-shadow: 0 2px 6px rgba(240, 83, 135, 0.4);
+}
+
+.stisla-admin .btn-danger {
+  background-color: #fc544b;
+  border-color: #fc544b;
+  color: #fff;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 4px;
+}
+
+.stisla-admin .btn-success {
+  background-color: #47c363;
+  border-color: #47c363;
+  color: #fff;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 4px;
+}
+
+/* Inputs */
+.stisla-admin .form-control {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  height: 42px;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.stisla-admin .form-control:focus {
+  border-color: var(--theme-color);
+  outline: none;
+}
+
+/* Tables */
+.stisla-admin .table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-main);
+  table-layout: auto;
+}
+
+.stisla-admin .table th,
+.stisla-admin .table td {
+  padding: 14px 20px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.stisla-admin .table th:first-child,
+.stisla-admin .table td:first-child {
+  padding-left: 25px;
+}
+
+.stisla-admin .table th:last-child,
+.stisla-admin .table td:last-child {
+  padding-right: 25px;
+}
+
+.stisla-admin .table th {
+  background-color: rgba(0, 0, 0, 0.02);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+[data-admin-theme="dark"] .stisla-admin .table th {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.stisla-admin .table td {
+  border-bottom: 1px solid var(--table-border);
+  font-size: 13px;
+}
+
+/* Footer */
+.stisla-admin .main-footer {
+  padding: 20px 30px;
+  margin-top: 40px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Login Page Exact Replica */
+.stisla-login-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('/admin-assets/images/background-image-stock.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px 60px;
+}
+
+.stisla-login-wrapper .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.stisla-login-card {
+  position: relative;
+  z-index: 10;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 35px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+[data-admin-theme="dark"] .stisla-login-card {
+  background-color: #1e2430;
+  color: #e2e8f0;
+}
+
+/* Category Icon Badge & Picker Styles */
+.cat-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(240, 83, 135, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 1px solid rgba(240, 83, 135, 0.2);
+  flex-shrink: 0;
+}
+
+[data-admin-theme="dark"] .cat-icon-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.cat-icon-badge img {
+  width: 24px;
+  height: 24px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.icon-picker-item img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+}
+
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 8px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.icon-picker-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--card-bg);
+}
+
+.icon-picker-item:hover {
+  border-color: rgba(240, 83, 135, 0.5);
+}
+
+.icon-picker-item.selected {
+  border-color: #f05387;
+  background: rgba(240, 83, 135, 0.1);
+}
+
+/* Enhanced Mobile Responsiveness (Stisla Responsive Engine) */
+@media (max-width: 1024px) {
+  .stisla-admin .main-navbar {
+    left: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .stisla-admin .main-sidebar {
+    transform: translateX(-270px) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+  }
+  .stisla-admin.sidebar-mobile-open .main-sidebar {
+    transform: translateX(0) !important;
+  }
+  .stisla-admin .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+  }
+  .stisla-admin .main-content {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    padding-top: 85px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stisla-admin .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+  }
+  .stisla-admin .section-header h1 {
+    font-size: 18px;
+  }
+  .stisla-admin .section-header button {
+    width: 100%;
+    justify-content: center;
+  }
+  .stisla-admin .card .card-header {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .stisla-admin .card .card-body {
+    padding: 16px;
+  }
+  .stisla-admin .card.card-statistic-1 {
+    margin-bottom: 15px;
+  }
+  .stisla-admin .card.card-statistic-1 .card-icon {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    font-size: 22px;
+    margin: 8px;
+    margin-right: 12px;
+  }
+  .stisla-admin .card.card-statistic-1 .card-wrap {
+    padding: 12px 0;
+  }
+  .stisla-admin .card.card-statistic-1 .card-body {
+    font-size: 20px;
+  }
+  .stisla-admin .table th,
+  .stisla-admin .table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .stisla-admin .main-footer {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 20px 15px;
+  }
+  .stisla-login-wrapper {
+    padding: 20px 16px;
+    justify-content: center;
+  }
+  .stisla-login-card {
+    padding: 25px 20px;
+  }
+}

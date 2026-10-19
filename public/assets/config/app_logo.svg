@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+  <defs>
+    <linearGradient id="cordGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef5388" />
+      <stop offset="60%" stop-color="#f05387" />
+      <stop offset="100%" stop-color="#8a33f6" />
+    </linearGradient>
+    <style>
+      .study-text {
+        font-family: 'Nunito', 'Inter', system-ui, -apple-system, sans-serif;
+        font-weight: 900;
+        fill: #233354;
+      }
+      .cord-text {
+        font-family: 'Nunito', 'Inter', system-ui, -apple-system, sans-serif;
+        font-weight: 900;
+        fill: url(#cordGrad);
+      }
+      @media (prefers-color-scheme: dark) {
+        .study-text {
+          fill: #ffffff;
+        }
+      }
+    </style>
+  </defs>
+
+  <!-- Clean Wordmark: StudyCord with guaranteed non-overlapping spacing between 'y' and 'C' -->
+  <text x="6" y="36" font-size="36" class="study-text" letter-spacing="0">Study</text>
+  <text x="97" y="36" font-size="36" class="cord-text" letter-spacing="0">Cord</text>
+</svg>

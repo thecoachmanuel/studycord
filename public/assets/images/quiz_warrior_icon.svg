@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Warrior Shield -->
+  <path d="M24 4L38 9V22C38 31.5 24 44 24 44C24 44 10 31.5 10 22V9L24 4Z" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Crossed Battle Swords -->
+  <path d="M16 16L32 32M32 32L34 28M32 32L28 34" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 16L16 32M16 32L14 28M16 32L20 34" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Sword Guards -->
+  <path d="M14 20L20 14M28 14L34 20" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Central Star of Victory -->
+  <circle cx="24" cy="24" r="3" fill="#ffffff"/>
+</svg>
