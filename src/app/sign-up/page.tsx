@@ -3,10 +3,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { User, Mail, Lock, Eye, EyeOff, Tag, Gift, Smartphone } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Tag, Gift } from 'lucide-react';
 import { StudyCordLogo } from '../../components/common/StudyCordLogo';
 import { QButton } from '../../components/common/QButton';
-import { CountryCodePicker, COUNTRIES, CountryInfo } from '../../components/common/CountryCodePicker';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { soundManager } from '../../lib/sound';
@@ -20,8 +19,6 @@ function SignUpContent() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [country, setCountry] = useState<CountryInfo>(COUNTRIES[0]); // Nigeria (+234)
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [referCode, setReferCode] = useState('');
@@ -58,8 +55,6 @@ function SignUpContent() {
     setLoading(true);
     setError('');
 
-    const formattedMobile = phoneNumber.trim() ? `${country.dialCode} ${phoneNumber.trim()}` : '';
-
     try {
       const res = await fetch('/api/users', {
         method: 'POST',
@@ -67,7 +62,7 @@ function SignUpContent() {
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim().toLowerCase(),
-          mobile: formattedMobile,
+          mobile: '',
           referCode: referCode.trim(),
           coins: 250,
           score: 0,
@@ -173,21 +168,6 @@ function SignUpContent() {
               placeholder="Email Address"
               className={`w-full h-12 pl-11 pr-4 rounded-[10px] text-sm font-medium ${inputBg} ${textColor} ${placeholderColor} border border-transparent focus:border-[#ef5388] outline-none shadow-sm transition-all`}
               required
-            />
-          </div>
-
-          {/* Phone Number with Country Code */}
-          <div className={`relative flex items-center h-12 rounded-[10px] overflow-hidden border border-transparent focus-within:border-[#ef5388] shadow-sm ${inputBg}`}>
-            <CountryCodePicker
-              selectedCountry={country}
-              onSelectCountry={setCountry}
-            />
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
-              placeholder="Phone Number (e.g. 801 234 5678)"
-              className={`flex-1 h-full px-3.5 text-sm font-medium ${inputBg} ${textColor} ${placeholderColor} outline-none`}
             />
           </div>
 
