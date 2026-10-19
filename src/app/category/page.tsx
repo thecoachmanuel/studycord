@@ -7,7 +7,7 @@ import { QAppBar } from '../../components/common/QAppBar';
 import { QImage } from '../../components/common/QImage';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { MOCK_SUBCATEGORIES } from '../../lib/api';
+import { MOCK_SUBCATEGORIES, MOCK_CATEGORIES } from '../../lib/api';
 import { Subcategory } from '../../types';
 import { soundManager } from '../../lib/sound';
 import { smartBack } from '../../lib/navigation';
